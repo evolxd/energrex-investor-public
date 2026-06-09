@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ENERGREX Investor Transparency Dashboard</title>
+  <style>
+    :root {
+      --bg:#f5f8fc; --ink:#122033; --muted:#63748a; --line:#d9e3ef;
+      --blue:#1f6feb; --cyan:#0ea5e9; --green:#10b981; --yellow:#d99b00;
+      --orange:#f97316; --red:#ef4444; --panel:#ffffff;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; font-family:Inter,Segoe UI,Arial,sans-serif; color:var(--ink);
+      background:linear-gradient(135deg,#eef6ff 0%,#f8fbff 38%,#eef5fb 100%);
+    }
+    .wrap { max-width:1180px; margin:0 auto; padding:28px 18px 40px; }
+    .hero {
+      border:1px solid #c8ddf4; border-radius:18px; padding:28px;
+      background:linear-gradient(135deg,#123b66 0%,#1665b8 52%,#2dd4bf 145%);
+      color:white; box-shadow:0 18px 45px rgba(31,111,235,.16);
+    }
+    .hero h1 { margin:0 0 8px; font-size:34px; letter-spacing:0; }
+    .hero p { margin:0; color:#d9edff; font-size:17px; line-height:1.5; }
+    .grid { display:grid; gap:16px; margin-top:18px; grid-template-columns:repeat(4,minmax(0,1fr)); }
+    .card {
+      background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px;
+      box-shadow:0 10px 26px rgba(18,32,51,.06);
+    }
+    .label { color:var(--muted); font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
+    .value { margin-top:8px; font-size:30px; font-weight:800; }
+    .hint { margin-top:8px; color:var(--muted); font-size:14px; line-height:1.45; }
+    .status.green { color:var(--green); } .status.yellow { color:var(--yellow); }
+    .status.orange { color:var(--orange); } .status.red { color:var(--red); }
+    .wide { grid-column:span 2; }
+    .panel-title { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; margin-bottom:12px; }
+    .panel-title h2 { margin:0; font-size:22px; }
+    .panel-title span { color:var(--muted); font-size:14px; }
+    svg { width:100%; height:260px; display:block; }
+    table { width:100%; border-collapse:collapse; }
+    th,td { padding:11px 8px; border-bottom:1px solid var(--line); text-align:left; font-size:14px; }
+    th { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+    .bar { height:10px; border-radius:999px; background:#e7eef8; overflow:hidden; }
+    .bar i { display:block; height:100%; background:linear-gradient(90deg,var(--blue),var(--cyan)); }
+    .note { margin-top:18px; color:var(--muted); font-size:13px; line-height:1.55; }
+    @media (max-width:900px) { .grid { grid-template-columns:1fr 1fr; } .wide { grid-column:span 2; } }
+    @media (max-width:620px) { .grid { grid-template-columns:1fr; } .wide { grid-column:span 1; } .hero h1 { font-size:28px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>ENERGREX Investor Transparency Dashboard</h1>
+      <p>Public-safe overview of risk discipline, NAV index movement, stress budget use, and portfolio theme concentration. Detailed positions and trade instructions are intentionally withheld.</p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <div class="label">Risk State</div>
+        <div id="riskState" class="value status">-</div>
+        <div id="riskText" class="hint"></div>
+      </div>
+      <div class="card">
+        <div class="label">NAV Index</div>
+        <div id="navIndex" class="value">-</div>
+        <div class="hint">Base 100 index. No raw account value shown.</div>
+      </div>
+      <div class="card">
+        <div class="label">-10% Stress</div>
+        <div id="stress10" class="value">-</div>
+        <div class="hint">Estimated impact under a broad downside shock.</div>
+      </div>
+      <div class="card">
+        <div class="label">-20% Stress</div>
+        <div id="stress20" class="value">-</div>
+        <div class="hint">Tail-risk view under a deeper shock.</div>
+      </div>
+      <div class="card wide">
+        <div class="panel-title"><h2>NAV Index Trend</h2><span>indexed, public-safe</span></div>
+        <svg id="navChart"></svg>
+      </div>
+      <div class="card wide">
+        <div class="panel-title"><h2>Stress Trend</h2><span>risk budget use over time</span></div>
+        <svg id="stressChart"></svg>
+      </div>
+      <div class="card wide">
+        <div class="panel-title"><h2>Theme Concentration</h2><span>no individual positions shown</span></div>
+        <table id="themeTable"></table>
+      </div>
+      <div class="card wide">
+        <div class="panel-title"><h2>Process Controls</h2><span>investor-readable policy</span></div>
+        <table>
+          <tbody>
+            <tr><td>Primary controls</td><td>IV regime, days to expiry, account drawdown, stress loss</td></tr>
+            <tr><td>Trading authority</td><td>Dashboard provides monitoring only; no automatic order placement</td></tr>
+            <tr><td>Stress policy</td><td>8% warning, 12% review, 15% hard review line</td></tr>
+            <tr><td>Transparency limit</td><td>Detailed strikes, quantities, costs, Greeks, and trade plans stay private</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <div class="note">This page is not an offer, solicitation, recommendation, or performance guarantee. It is a sanitized transparency artifact for process review only.</div>
+  </div>
+  <script id="payload" type="application/json">{"generatedAt": "2026-06-09T11:44:50", "history": [{"date": "2026-06-01", "nav": 100.0, "stress10": 0.141556, "stress20": 0.267349, "leverage": 10.0627, "betaDelta": 4.392484, "status": "ORANGE_STRESS_DE_RISK_REVIEW"}, {"date": "2026-06-01", "nav": 100.0, "stress10": 0.104669, "stress20": 0.194118, "leverage": 4.505733, "betaDelta": 3.354932, "status": "YELLOW_STRESS_WARNING"}, {"date": "2026-06-01", "nav": 100.0, "stress10": 0.104669, "stress20": 0.194118, "leverage": 4.505733, "betaDelta": 3.354932, "status": "YELLOW_STRESS_WARNING"}, {"date": "2026-06-01", "nav": 106.5, "stress10": 0.098285, "stress20": 0.182278, "leverage": 4.230928, "betaDelta": 3.150314, "status": "YELLOW_STRESS_WARNING"}, {"date": "2026-06-02", "nav": 106.5, "stress10": 0.117311, "stress20": 0.219456, "leverage": 8.604178, "betaDelta": 3.540275, "status": "YELLOW_STRESS_WARNING"}, {"date": "2026-06-02", "nav": 106.5, "stress10": 0.071536, "stress20": 0.118667, "leverage": 8.462531, "betaDelta": 3.09688, "status": "GREEN"}, {"date": "2026-06-02", "nav": 106.5, "stress10": 0.071536, "stress20": 0.118667, "leverage": 8.462531, "betaDelta": 3.09688, "status": "GREEN"}, {"date": "2026-06-02", "nav": 109.25, "stress10": 0.069731, "stress20": 0.115672, "leverage": 8.248929, "betaDelta": 3.018712, "status": "GREEN"}, {"date": "2026-06-02", "nav": 109.25, "stress10": 0.069731, "stress20": 0.115672, "leverage": 8.248929, "betaDelta": 3.018712, "status": "GREEN"}, {"date": "2026-06-02", "nav": 109.25, "stress10": 0.069731, "stress20": 0.115672, "leverage": 8.248929, "betaDelta": 3.018712, "status": "GREEN"}, {"date": "2026-06-02", "nav": 109.25, "stress10": 0.069731, "stress20": 0.115672, "leverage": 8.248929, "betaDelta": 3.018712, "status": "GREEN"}, {"date": "2026-06-02", "nav": 115.02, "stress10": 0.050742, "stress20": 0.078013, "leverage": 11.031186, "betaDelta": 2.796046, "status": "GREEN"}, {"date": "2026-06-04", "nav": 115.02, "stress10": 0.025776, "stress20": 0.02861, "leverage": 10.263528, "betaDelta": 2.235761, "status": "GREEN"}, {"date": "2026-06-05", "nav": 115.02, "stress10": 0.028354, "stress20": 0.033375, "leverage": 10.388395, "betaDelta": 2.277753, "status": "GREEN"}, {"date": "2026-06-05", "nav": 115.02, "stress10": 0.028354, "stress20": 0.033375, "leverage": 10.388395, "betaDelta": 2.277753, "status": "RED_DATA_REVIEW"}, {"date": "2026-06-05", "nav": 97.34, "stress10": 0.033503, "stress20": 0.039435, "leverage": 12.274799, "betaDelta": 2.691364, "status": "RED_DATA_REVIEW"}, {"date": "2026-06-05", "nav": 97.34, "stress10": 0.033503, "stress20": 0.039435, "leverage": 12.274799, "betaDelta": 2.691364, "status": "RED_DATA_REVIEW"}, {"date": "2026-06-05", "nav": 97.34, "stress10": 0.015638, "stress20": 0.049917, "leverage": 6.493588, "betaDelta": 1.001521, "status": "RED_DATA_REVIEW"}, {"date": "2026-06-05", "nav": 97.34, "stress10": 0.023684, "stress20": 0.050092, "leverage": 10.081591, "betaDelta": 1.001521, "status": "RED_DATA_REVIEW"}, {"date": "2026-06-05", "nav": 97.34, "stress10": 0.125944, "stress20": 0.291365, "leverage": 10.081591, "betaDelta": 0.074101, "status": "RED_DATA_REVIEW"}, {"date": "2026-06-09", "nav": 81.35, "stress10": 0.011002, "stress20": 0.022005, "leverage": 6.23952, "betaDelta": 0.193807, "status": "RED_DATA_REVIEW"}, {"date": "2026-06-09", "nav": 81.35, "stress10": 0.011002, "stress20": 0.022005, "leverage": 6.23952, "betaDelta": 0.193807, "status": "RED_DATA_REVIEW"}, {"date": "2026-06-09", "nav": 91.42, "stress10": 0.00979, "stress20": 0.019581, "leverage": 5.552236, "betaDelta": 0.172459, "status": "RED_DATA_REVIEW"}, {"date": "2026-06-09", "nav": 91.42, "stress10": 0.142585, "stress20": 0.262802, "leverage": 9.954735, "betaDelta": 4.119062, "status": "ORANGE_STRESS_DE_RISK_REVIEW"}, {"date": "2026-06-09", "nav": 91.42, "stress10": 0.144981, "stress20": 0.265464, "leverage": 10.130337, "betaDelta": 4.228019, "status": "ORANGE_STRESS_DE_RISK_REVIEW"}, {"date": "2026-06-09", "nav": 89.47, "stress10": 0.067269, "stress20": 0.108754, "leverage": 15.9625, "betaDelta": 3.180672, "status": "YELLOW_FAST_WORSENING"}], "latest": {"date": "2026-06-09", "nav": 89.47, "stress10": 0.067269, "stress20": 0.108754, "leverage": 15.9625, "betaDelta": 3.180672, "status": "YELLOW_FAST_WORSENING"}, "themes": [{"theme": "Macro Hedge", "riskUse": 4.1092019559158715}, {"theme": "Mega-cap Platforms", "riskUse": 3.3767163391267805}, {"theme": "Other Current Themes", "riskUse": 2.8854349101434806}, {"theme": "AI Semiconductors", "riskUse": 2.872712994160653}, {"theme": "Software & Cybersecurity", "riskUse": 2.718433316551128}], "risk": {"label": "Normal", "className": "green", "text": "Stress risk is inside the current budget."}}</script>
+  <script>
+    const DATA = JSON.parse(document.getElementById('payload').textContent);
+    const fmtPct = x => ((Number(x)||0) * 100).toFixed(1) + '%';
+    const latest = DATA.latest || {};
+    document.getElementById('riskState').textContent = DATA.risk.label;
+    document.getElementById('riskState').classList.add(DATA.risk.className);
+    document.getElementById('riskText').textContent = DATA.risk.text;
+    document.getElementById('navIndex').textContent = (Number(latest.nav)||100).toFixed(1);
+    document.getElementById('stress10').textContent = fmtPct(latest.stress10);
+    document.getElementById('stress20').textContent = fmtPct(latest.stress20);
+
+    function drawLine(id, rows, field, color) {
+      const svg = document.getElementById(id);
+      const w = 760, h = 260, p = 28;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      if (!rows.length) { svg.innerHTML = '<text x="28" y="130" fill="#63748a">No data</text>'; return; }
+      const vals = rows.map(r => Number(r[field]) || 0);
+      const min = Math.min(...vals), max = Math.max(...vals);
+      const span = Math.max(max - min, 0.0001);
+      const pts = rows.map((r,i) => {
+        const x = p + i * (w - p*2) / Math.max(rows.length - 1, 1);
+        const y = h - p - ((Number(r[field]) - min) / span) * (h - p*2);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+      svg.innerHTML = `
+        <line x1="${p}" y1="${h-p}" x2="${w-p}" y2="${h-p}" stroke="#d9e3ef"/>
+        <line x1="${p}" y1="${p}" x2="${p}" y2="${h-p}" stroke="#d9e3ef"/>
+        <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="${p}" y="22" fill="#63748a" font-size="12">${rows[0].date || ''}</text>
+        <text x="${w-p-78}" y="22" fill="#63748a" font-size="12">${rows[rows.length-1].date || ''}</text>`;
+    }
+    drawLine('navChart', DATA.history || [], 'nav', '#1f6feb');
+    drawLine('stressChart', DATA.history || [], 'stress10', '#f97316');
+
+    document.getElementById('themeTable').innerHTML = `
+      <thead><tr><th>Theme</th><th>Risk Use</th><th>Visual</th></tr></thead>
+      <tbody>${(DATA.themes || []).map(t => `<tr><td>${t.theme}</td><td>${fmtPct(t.riskUse)}</td><td><div class="bar"><i style="width:${Math.min(100, t.riskUse*100).toFixed(1)}%"></i></div></td></tr>`).join('')}</tbody>`;
+  </script>
+</body>
+</html>
